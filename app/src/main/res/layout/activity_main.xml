@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="me.tatarka.bindingcollectionadapter2.LayoutManagers"/>
+        <variable
+            name="viewModel"
+            type="com.example.myapplication.model.ViewModel"/>
+
+        <variable
+            name="state"
+            type="com.example.myapplication.mainscreen.State"/>
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/ll_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <SearchView
+                android:id="@+id/sv_search_recipe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/srl_main_swipe"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_recipe_item"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:items="@{viewModel.mergeItems}"
+                    app:itemBinding="@{viewModel.multipleItem}"
+                    app:layoutManager="@{LayoutManagers.linear()}"
+                    tools:listitem="@layout/item_row"/>
+
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+        </LinearLayout>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lav_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical|center_horizontal"
+            app:lottie_fileName="loading.json"
+            app:lottie_loop="true"
+            app:start_lottie_anim="@{state}"/>
+
+    </FrameLayout>
+</layout>
