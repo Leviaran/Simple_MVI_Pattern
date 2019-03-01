@@ -28,12 +28,16 @@
             <SearchView
                 android:id="@+id/sv_search_recipe"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:queryHint="omelet"
+                android:iconifiedByDefault="false"
+                android:focusable="false"/>
 
             <android.support.v4.widget.SwipeRefreshLayout
                 android:id="@+id/srl_main_swipe"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                app:state_swipe_refresh="@{state}">
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rv_recipe_item"

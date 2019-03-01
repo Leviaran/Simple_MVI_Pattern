@@ -3,20 +3,19 @@ package com.example.myapplication.mainscreen
 import android.annotation.SuppressLint
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
-import android.util.Log
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityMainBinding
+import com.example.myapplication.model.Result
 import com.example.myapplication.model.ViewModel
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
-import com.jakewharton.rxbinding2.view.RxView
 import com.jakewharton.rxbinding2.widget.RxSearchView
 import com.trello.rxlifecycle2.RxLifecycle
 import com.trello.rxlifecycle2.android.ActivityEvent
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
@@ -37,11 +36,26 @@ class MainActivity : RxAppCompatActivity() {
         binding.viewModel = ViewModel()
         binding.state = State.NEUTRAL
 
+
+        val observer = Observable.defer<List<Result>> {
+            viewModel.getObservableResult("omelet",1)
+                .doOnSubscribe { setIsBotLoading(false) }
+                .doAfterTerminate { currentPage++; binding.executePendingBindings() }}
+            .map { binding.viewModel?.apply {
+                items.addAll(it)
+                mergeItems?.insertItem("footer")
+            } }
+            .compose(RxLifecycle.bindUntilEvent(lifecycle(), ActivityEvent.DESTROY))
+            .share()
+
+        observer.subscribe({ binding.state = State.SUCCESS}, {binding.state = State.FAILED})
+
         RxSearchView.queryTextChangeEvents(binding.svSearchRecipe)
             .throttleLast(100, TimeUnit.MILLISECONDS)
             .debounce(1000, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .filter { !TextUtils.isEmpty(it.queryText()) }
+            .doOnNext { binding.viewModel?.mergeItems?.removeAll(); currentPage = 0 }
             .flatMap {
                 viewModel.getObservableResult(it.queryText().toString(),1)
                     .doOnSubscribe{setIsBotLoading(false)}
@@ -54,17 +68,12 @@ class MainActivity : RxAppCompatActivity() {
             .compose(RxLifecycle.bindUntilEvent(lifecycle(), ActivityEvent.DESTROY))
             .subscribe({ binding.state = State.SUCCESS}, {binding.state = State.FAILED})
 
-
-        RxView.attachEvents(binding.srlMainSwipe)
-            .observeOn(AndroidSchedulers.mainThread())
-            .map { (it.view() as SwipeRefreshLayout) }
-            .filter { it.isRefreshing }
-            .flatMap { viewModel.getObservableResult("omelet", currentPage) }
-            .map { binding.viewModel?.apply {
-                mergeItems?.clear()
-                items.addAll(it) } }
-            .compose(RxLifecycle.bindUntilEvent(lifecycle(), ActivityEvent.DESTROY))
-            .subscribe()
+        binding.srlMainSwipe.setOnRefreshListener {
+            currentPage = 1
+            binding.viewModel?.items?.clear()
+            binding.viewModel?.mergeItems?.removeItem("footer")
+            observer.subscribe({ binding.state = State.SUCCESS; }, {binding.state = State.FAILED})
+        }
 
         RxRecyclerView.scrollEvents(binding.rvRecipeItem)
             .filter {

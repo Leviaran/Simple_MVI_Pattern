@@ -1,6 +1,7 @@
 package com.example.myapplication.bindingadapter
 
 import android.databinding.BindingAdapter
+import android.support.v4.widget.SwipeRefreshLayout
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -48,6 +49,13 @@ object MainBinding {
                 visibility = View.GONE
             }
         }
+    }
+
+    @BindingAdapter("app:state_swipe_refresh")
+    @JvmStatic
+    fun setState(swipeRefreshLayout: SwipeRefreshLayout, state: State) {
+        if (state is State.SUCCESS || state is State.FAILED)
+            swipeRefreshLayout.isRefreshing = false
     }
 
 }
