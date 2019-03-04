@@ -35,3 +35,11 @@ what we will going to do
 * Fixing Pull Refresh layout
 * Adding detail
 
+# Recommended Reading
+* [Multi-part series on MVI by Hannes Dorfmann](http://hannesdorfmann.com/android/mosby3-mvi-1)
+* [Mosby library](https://github.com/sockeqwe/mosby)
+* [Managing state with RxJava talk by Jake Wharton](https://www.youtube.com/watch?v=0IKHxjkgop4)
+* [Cycle.js by André Staltz](https://cycle.js.org/)
+* [Introduce Reactive programming](http://blog.danlew.net/2017/07/27/an-introduction-to-functional-reactive-programming/)
+* [Get to know MVI](http://thenewstack.io/developers-need-know-mvi-player-view-intent/)
+* [Anothe MV band](https://proandroiddev.com/mvi-a-new-member-of-the-mv-band-6f7f0d23bc8a)
