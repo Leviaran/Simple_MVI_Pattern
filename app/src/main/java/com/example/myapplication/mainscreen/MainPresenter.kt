@@ -13,6 +13,7 @@ import okhttp3.OkHttpClient
 class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
 
     var currentPage = 1
+    val FIRST_SEARCH = "omelet"
 
     fun getObservableResult(textSrc: String, page: Int): Observable<List<Result>> {
 
@@ -40,7 +41,7 @@ class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
         val firstDataState: Observable<MainViewState> = intent(MainView::loadFirstData)
             .map { currentPage = 1; return@map true }
             .switchMap {
-                getObservableResult("omelet", currentPage)
+                getObservableResult(FIRST_SEARCH, currentPage)
                     .observeOn(AndroidSchedulers.mainThread())
                     .map { MainViewState.DataState(it) as MainViewState }
                     .startWith(MainViewState.LoadingState)
@@ -51,7 +52,7 @@ class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
         val nextData: Observable<MainViewState> = intent(MainView::loadNextData)
             .subscribeOn(Schedulers.io())
             .switchMap {
-                getObservableResult("omelet", currentPage)
+                getObservableResult(FIRST_SEARCH, currentPage)
                     .observeOn(AndroidSchedulers.mainThread())
                     .map { MainViewState.NextDataState(it) as MainViewState }
                     .onErrorReturn { MainViewState.DataState(listOf()) }
