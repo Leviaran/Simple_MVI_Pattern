@@ -74,7 +74,7 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
     }
 
     private fun getTotalDataInReyclerViewAdapter(recyclerView: RecyclerView): Int {
-        return recyclerView.adapter.itemCount
+        return recyclerView.adapter?.itemCount ?: 0
     }
 
     private fun getRecyclerLayoutManager(recyclerView: RecyclerView): LinearLayoutManager {
