@@ -22,7 +22,6 @@ const val BASE_URL = "http://www.recipepuppy.com/api/"
 
 class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
 
-    private var currentPage = 1
     private lateinit var binding: ActivityMainBinding
 
     @SuppressLint("CheckResult")
@@ -83,7 +82,6 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
     }
 
     private fun resetAllValue() {
-        currentPage = 1
         binding.viewModel?.apply {
             items.clear()
             mergeItems?.removeItem("footer")
