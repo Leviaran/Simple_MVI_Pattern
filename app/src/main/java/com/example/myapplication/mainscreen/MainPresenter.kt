@@ -1,5 +1,6 @@
 package com.example.myapplication.mainscreen
 
+import com.androidnetworking.interceptors.HttpLoggingInterceptor
 import com.example.myapplication.model.RecipeModel
 import com.example.myapplication.model.Result
 import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
@@ -15,8 +16,8 @@ class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
 
     fun getObservableResult(textSrc: String, page: Int): Observable<List<Result>> {
 
-        val interceptor = com.androidnetworking.interceptors.HttpLoggingInterceptor()
-        interceptor.level = com.androidnetworking.interceptors.HttpLoggingInterceptor.Level.BODY
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
 
         val okHttpClient = OkHttpClient().newBuilder()
             .addInterceptor(interceptor)
