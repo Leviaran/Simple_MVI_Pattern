@@ -35,8 +35,7 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
     override fun loadNextData(): Observable<Boolean> {
         return RxRecyclerView.scrollStateChanges(binding.rvRecipeItem)
             .filter { event -> event == RecyclerView.SCROLL_STATE_IDLE }
-            .filter { event ->
-                getRecyclerLayoutManager(binding.rvRecipeItem)
+            .filter { getRecyclerLayoutManager(binding.rvRecipeItem)
                     .findLastCompletelyVisibleItemPosition() == getTotalDataInReyclerViewAdapter(binding.rvRecipeItem) - 1
             }
             .map { true }
