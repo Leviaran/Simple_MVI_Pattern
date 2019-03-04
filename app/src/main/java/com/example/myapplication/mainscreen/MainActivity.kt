@@ -74,16 +74,8 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
         Toast.makeText(this, throwable.message, Toast.LENGTH_LONG).show()
     }
 
-    private fun getTotalItemCount(recyclerView: RecyclerView): Int {
-        return (recyclerView.layoutManager as LinearLayoutManager).itemCount
-    }
-
     private fun getTotalDataInReyclerViewAdapter(recyclerView: RecyclerView): Int {
         return recyclerView.adapter.itemCount
-    }
-
-    private fun getLastVisiblePosition(recyclerView: RecyclerView): Int {
-        return (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
     }
 
     private fun getRecyclerLayoutManager(recyclerView: RecyclerView): LinearLayoutManager {

@@ -16,5 +16,4 @@ class ViewModel {
     val multipleItem = OnItemBindClass<Any>()
         .map(String::class.java, ItemBinding.VAR_NONE, R.layout.item_loading)
         .map(Result::class.java, BR.itemResult, R.layout.item_row)
-
 }
