@@ -1,5 +1,6 @@
 ![Made in](https://img.shields.io/badge/made%20in-kotlin-blue.svg)
 [![Build Status](https://travis-ci.org/Leviaran/Simple_MVI_Pattern.svg?branch=master)](https://travis-ci.org/Leviaran/Simple_MVI_Pattern)
+![state](https://img.shields.io/badge/state-development-red.svg)
 
 # Simple MVI Pattern
 Simple Model View Intent (MVI) architecture app with reactive paradigm. This is pattern based on [cycle.js](https://youtu.be/1zj7M1LnJV4), the workflow is undirectional and circular data flow, each flow have state from user interaction(intent). This new state is rendered on view and trigger new update view to show the user.
