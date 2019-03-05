@@ -6,16 +6,21 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.example.myapplication.R
+import com.example.myapplication.Utils.setError
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.model.Result
 import com.example.myapplication.model.ViewModel
 import com.hannesdorfmann.mosby3.mvi.MviActivity
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
+import com.jakewharton.rxbinding2.widget.RxSearchView
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import java.util.concurrent.TimeUnit
 
 
 const val BASE_URL = "http://www.recipepuppy.com/api/"
@@ -41,6 +46,19 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
             .map { true }
     }
 
+    @SuppressLint("CheckResult")
+    override fun loadSearchData() : Observable<String> {
+        return RxSearchView.queryTextChanges(binding.svSearchRecipe)
+            .skip(2)
+            .debounce(1000, TimeUnit.MILLISECONDS)
+            .distinctUntilChanged()
+            .filter { !TextUtils.isEmpty(it) }
+            .observeOn(AndroidSchedulers.mainThread())
+            .filter { if (it.length < 3) { binding.svSearchRecipe.setError("Your keyword less than 3"); return@filter false}
+            else return@filter true}
+            .map(CharSequence::toString)
+    }
+
     override fun loadFirstData(): Observable<Boolean> {
         return Observable.just(true)
     }
@@ -51,6 +69,7 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
             is MainViewState.DataState -> renderDataState(state.result, state)
             is MainViewState.ErrorState -> renderErrorState(state.error)
             is MainViewState.NextDataState -> renderDataState(state.result, state)
+            is MainViewState.SearchState -> renderSearchState(state.result)
         }
     }
 
@@ -66,6 +85,14 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
         binding.viewModel?.items?.addAll(dataState)
         binding.executePendingBindings()
         binding.state = State.SUCCESS
+    }
+
+    private fun renderSearchState(dataState: List<Result>) {
+        binding.viewModel?.mergeItems?.insertItem("footer")
+        binding.viewModel?.items?.addAll(dataState)
+        binding.executePendingBindings()
+        binding.state = State.SUCCESS
+        hideKeyboard(binding.root)
     }
 
     private fun renderErrorState(throwable: Throwable) {

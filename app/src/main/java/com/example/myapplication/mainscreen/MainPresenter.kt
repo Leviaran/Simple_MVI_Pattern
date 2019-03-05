@@ -59,7 +59,18 @@ class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
                     .doAfterTerminate { currentPage++ }
             }
 
-        val allIntentObservable = Observable.merge(firstDataState, nextData)
+        val searchData: Observable<MainViewState> = intent(MainView::loadSearchData)
+            .map { currentPage = 1; return@map it }
+            .subscribeOn(Schedulers.io())
+            .switchMap { getObservableResult(it, currentPage)
+                .observeOn(AndroidSchedulers.mainThread())
+                .map { MainViewState.SearchState(it) as MainViewState }
+                .startWith(MainViewState.LoadingState)
+                .onErrorReturn { MainViewState.DataState(listOf()) }
+                .doAfterTerminate { currentPage++ }
+            }
+
+        val allIntentObservable = Observable.merge(firstDataState, nextData, searchData)
             .observeOn(AndroidSchedulers.mainThread())
 
         subscribeViewState(allIntentObservable.distinctUntilChanged(), MainView::render)

@@ -8,4 +8,5 @@ sealed class MainViewState {
     data class NextDataState(val result: List<Result>) : MainViewState()
     data class PullRefreshState(val result: List<Result>) : MainViewState()
     data class ErrorState(val error: Throwable) : MainViewState()
+    data class SearchState(val result: List<Result>) : MainViewState()
 }
