@@ -59,6 +59,7 @@ dependencies {
     implementation "com.airbnb.android:lottie:2.7.0"
     kapt 'com.github.bumptech.glide:compiler:4.9.0'
     testImplementation 'junit:junit:4.12'
-    testImplementation 'com.android.support.test:rules:0.5'
+    androidTestImplementation 'com.android.support.test:rules:0.5'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
 }
