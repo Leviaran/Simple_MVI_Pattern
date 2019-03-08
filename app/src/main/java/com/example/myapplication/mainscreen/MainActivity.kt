@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -18,16 +19,21 @@ import com.example.myapplication.model.ViewModel
 import com.hannesdorfmann.mosby3.mvi.MviActivity
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.jakewharton.rxbinding2.widget.RxSearchView
+import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 import java.util.concurrent.TimeUnit
 
 
 const val BASE_URL = "http://www.recipepuppy.com/api/"
 
-class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
+class MainActivity : MviActivity<MainView, MainPresenter>(), MainView, ViewModel.OnItemClickListener {
 
     private lateinit var binding: ActivityMainBinding
+    private val unsubs = CompositeDisposable()
+    private val onClickPublishSubject = PublishRelay.create<Result>()
 
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +41,19 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.viewModel = ViewModel()
         binding.state = State.NEUTRAL
+        binding.viewModel?.onItemClickListener = this
+
+        initPublishSubject()
+    }
+
+    private fun initPublishSubject() {
+        val onClickSubscription = onClickPublishSubject
+            .debounce(300, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({Log.e("hasilnya",it.toString())},
+                {Log.e("erorr", it.message)})
+
+        unsubs.add(onClickSubscription)
     }
 
     override fun loadNextData(): Observable<Boolean> {
@@ -71,6 +90,10 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
             is MainViewState.NextDataState -> renderDataState(state.result, state)
             is MainViewState.SearchState -> renderSearchState(state.result)
         }
+    }
+
+    override fun onItemClick(result: Result) {
+        onClickPublishSubject.accept(result)
     }
 
     override fun createPresenter(): MainPresenter = MainPresenter()
@@ -124,6 +147,11 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView {
     private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (!unsubs.isDisposed) unsubs.dispose()
     }
 }
 
