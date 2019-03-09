@@ -3,18 +3,21 @@ package com.example.myapplication.loginscreen
 import com.androidnetworking.common.Priority
 import com.androidnetworking.interceptors.HttpLoggingInterceptor
 import com.example.myapplication.Utils.BaseViewState
+import com.example.myapplication.mainscreen.BASE_URL
 import com.example.myapplication.mainscreen.MainViewState
 import com.example.myapplication.model.loginmodel.LoginRequest
 import com.example.myapplication.model.loginmodel.LoginResponse
 import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
 import com.hannesdorfmann.mosby3.mvp.MvpPresenter
+import com.pacoworks.rxpaper2.RxPaperBook
 import com.rx2androidnetworking.Rx2AndroidNetworking
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
 
-const val BASE_URL = "http://1d85e976.ngrok.io"
+const val USER_PREF = "user_pref"
+const val USER_BOOK = "user_book"
 
 class LoginPresenter : MviBasePresenter<LoginView, LoginViewState>() {
 
@@ -39,7 +42,12 @@ class LoginPresenter : MviBasePresenter<LoginView, LoginViewState>() {
                 .map<LoginViewState> { LoginViewState.DataState(it) }
                 .startWith(LoginViewState.LoadingState)
                 .onErrorReturn { LoginViewState.ErrorState(it) }
+                .flatMap { loginResponse -> RxPaperBook.with()
+                    .write(USER_PREF, loginResponse)
+                    .toObservable<LoginViewState>()
+                    .map<LoginViewState> { LoginViewState.SuccessAuthState }}
                 .observeOn(AndroidSchedulers.mainThread())
+
             }
 
         subscribeViewState(authResponseData.distinctUntilChanged(), LoginView::render)

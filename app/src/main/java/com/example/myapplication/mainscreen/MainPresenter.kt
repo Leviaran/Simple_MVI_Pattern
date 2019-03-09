@@ -1,19 +1,42 @@
 package com.example.myapplication.mainscreen
 
 import com.androidnetworking.interceptors.HttpLoggingInterceptor
+import com.example.myapplication.loginscreen.USER_PREF
 import com.example.myapplication.model.RecipeModel
 import com.example.myapplication.model.Result
+import com.example.myapplication.model.ViewModel
+import com.example.myapplication.model.loginmodel.LoginResponse
 import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
+import com.pacoworks.rxpaper2.RxPaperBook
 import com.rx2androidnetworking.Rx2AndroidNetworking
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 
-class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
+const val AUTH = "Authorization"
+
+class MainPresenter : MviBasePresenter<MainView, MainViewState>(), KoinComponent {
 
     var currentPage = 1
     val FIRST_SEARCH = "omelet"
+
+    val rxPaperBook : RxPaperBook by inject<RxPaperBook>()
+
+    fun getUserLocalData() : Observable<LoginResponse> {
+        return rxPaperBook.read<LoginResponse>(USER_PREF)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .onErrorResumeNext {  if (it is NoSuchElementException) {
+                Single.error(Exception("Lengt must be greater than six"))
+            } else {
+                Single.error(it)
+            }}
+            .toObservable()
+    }
 
     fun getObservableResult(textSrc: String, page: Int): Observable<List<Result>> {
 
@@ -24,17 +47,17 @@ class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
             .addInterceptor(interceptor)
             .build()
 
-        return Rx2AndroidNetworking
-            .get(BASE_URL)
-            .addQueryParameter("q", textSrc)
-            .addQueryParameter("p", "$page")
-            .setOkHttpClient(okHttpClient)
-            .build()
-            .getObjectObservable(RecipeModel::class.java)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map { it.results }
-
+        return getUserLocalData().flatMap { loginResponse ->
+            Rx2AndroidNetworking
+                .get("$BASE_URL/feedposts")
+                .addHeaders(AUTH, loginResponse.jwt)
+                .setOkHttpClient(okHttpClient)
+                .build()
+                .getObjectObservable(RecipeModel::class.java)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map { it.results }
+        }
     }
 
     override fun bindIntents() {

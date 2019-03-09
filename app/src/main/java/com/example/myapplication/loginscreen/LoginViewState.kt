@@ -7,5 +7,6 @@ import com.example.myapplication.model.loginmodel.LoginResponse
 sealed class LoginViewState {
     object LoadingState : LoginViewState()
     data class DataState(val result: LoginResponse) : LoginViewState()
+    object SuccessAuthState : LoginViewState()
     data class ErrorState(val error : Throwable) : LoginViewState()
 }

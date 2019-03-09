@@ -12,6 +12,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.example.myapplication.R
+import com.example.myapplication.Utils.hideKeyboard
 import com.example.myapplication.Utils.setError
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.model.Result
@@ -20,14 +21,16 @@ import com.hannesdorfmann.mosby3.mvi.MviActivity
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.jakewharton.rxbinding2.widget.RxSearchView
 import com.jakewharton.rxrelay2.PublishRelay
+import com.pacoworks.rxpaper2.RxPaperBook
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
+import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
 
-const val BASE_URL = "http://www.recipepuppy.com/api/"
+const val BASE_URL = "https://2f0243cd.ngrok.io/"
 
 class MainActivity : MviActivity<MainView, MainPresenter>(), MainView, ViewModel.OnItemClickListener {
 
@@ -115,7 +118,7 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView, ViewModel
         binding.viewModel?.items?.addAll(dataState)
         binding.executePendingBindings()
         binding.state = State.SUCCESS
-        hideKeyboard(binding.root)
+        baseContext.hideKeyboard(binding.root)
     }
 
     private fun renderErrorState(throwable: Throwable) {
@@ -142,11 +145,6 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView, ViewModel
             isBottomLoading -> binding.viewModel?.mergeItems?.insertItem("footer")
             else -> binding.state = State.LOADING
         }
-    }
-
-    private fun hideKeyboard(view: View) {
-        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     override fun onDestroy() {

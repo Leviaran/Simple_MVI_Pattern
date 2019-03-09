@@ -17,14 +17,13 @@ import com.hannesdorfmann.mosby3.mvi.MviActivity
 import com.jakewharton.rxbinding2.view.RxView
 import com.jakewharton.rxbinding2.widget.RxTextView
 import com.jakewharton.rxrelay2.PublishRelay
+import com.pacoworks.rxpaper2.RxPaperBook
 import io.paperdb.Paper
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
-
-const val USER_PREF = "user_pref"
 
 class LoginActivity : MviActivity<LoginView, LoginPresenter>(), LoginView {
 
@@ -72,15 +71,15 @@ class LoginActivity : MviActivity<LoginView, LoginPresenter>(), LoginView {
 
     override fun render(state: LoginViewState) {
         when (state) {
-            is LoginViewState.DataState -> authenticationSuccess(state.result)
+            is LoginViewState.SuccessAuthState -> authenticationSuccess()
             is LoginViewState.LoadingState -> showLoading()
             is LoginViewState.ErrorState -> showError(state.error)
         }
     }
 
-    private fun authenticationSuccess(response: LoginResponse) {
-        Paper.book().write(USER_PREF, response)
+    private fun authenticationSuccess() {
         startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 
     private fun showLoading() {

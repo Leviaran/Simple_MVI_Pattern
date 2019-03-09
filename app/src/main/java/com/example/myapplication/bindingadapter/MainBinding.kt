@@ -13,10 +13,11 @@ import com.example.myapplication.mainscreen.State
 
 object MainBinding {
 
-    @BindingAdapter("app:set_image")
+    @BindingAdapter("app:set_circ_image")
     @JvmStatic
     fun setImage(imageView: ImageView, urlStr : String) {
         Glide.with(imageView.context)
+            .applyDefaultRequestOptions(RequestOptions.circleCropTransform())
             .load(urlStr)
             .into(imageView)
     }
