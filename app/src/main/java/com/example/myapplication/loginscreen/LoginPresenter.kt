@@ -1,25 +1,26 @@
 package com.example.myapplication.loginscreen
 
+import android.util.Log
 import com.androidnetworking.common.Priority
 import com.androidnetworking.interceptors.HttpLoggingInterceptor
-import com.example.myapplication.Utils.BaseViewState
 import com.example.myapplication.mainscreen.BASE_URL
-import com.example.myapplication.mainscreen.MainViewState
-import com.example.myapplication.model.loginmodel.LoginRequest
 import com.example.myapplication.model.loginmodel.LoginResponse
 import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
-import com.hannesdorfmann.mosby3.mvp.MvpPresenter
-import com.pacoworks.rxpaper2.RxPaperBook
 import com.rx2androidnetworking.Rx2AndroidNetworking
+import io.paperdb.Book
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 
 const val USER_PREF = "user_pref"
 const val USER_BOOK = "user_book"
 
-class LoginPresenter : MviBasePresenter<LoginView, LoginViewState>() {
+class LoginPresenter : MviBasePresenter<LoginView, LoginViewState>(), KoinComponent {
+
+    val paperBook : Book by inject<Book>()
 
     override fun bindIntents() {
 
@@ -39,14 +40,15 @@ class LoginPresenter : MviBasePresenter<LoginView, LoginViewState>() {
                 .getObjectObservable(LoginResponse::class.java)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map<LoginViewState> { LoginViewState.DataState(it) }
+                .switchMap { loginResponse -> Observable.just(paperBook)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .map { it.write(USER_PREF, loginResponse) }
+                    .doOnError { Log.e("error",it.message) }
+                    .doOnNext { Log.e("result","success") }}
+                .map<LoginViewState> { LoginViewState.SuccessAuthState }
                 .startWith(LoginViewState.LoadingState)
                 .onErrorReturn { LoginViewState.ErrorState(it) }
-                .flatMap { loginResponse -> RxPaperBook.with()
-                    .write(USER_PREF, loginResponse)
-                    .toObservable<LoginViewState>()
-                    .map<LoginViewState> { LoginViewState.SuccessAuthState }}
-                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext { Log.e("trigger",it.toString()) }
 
             }
 

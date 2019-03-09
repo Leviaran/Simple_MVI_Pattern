@@ -7,7 +7,7 @@
     <data>
         <variable
             name="itemResult"
-            type="com.example.myapplication.model.Result"/>
+            type="com.example.myapplication.model.homemodel.ActivityFeedModel"/>
         <variable
             name="listener"
             type="com.example.myapplication.model.ViewModel.OnItemClickListener"/>
@@ -40,6 +40,7 @@
                 android:contentDescription="@string/app_name"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:set_circ_image="@{itemResult.user.photoProfile.url}"
                 tools:src="@drawable/cir" />
 
             <ImageView
@@ -62,6 +63,7 @@
                 android:layout_marginEnd="13dp"
                 android:layout_marginRight="13dp"
                 android:scaleType="centerCrop"
+                app:set_image="@{itemResult.postImage.url}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView2"
@@ -77,6 +79,7 @@
                 android:fontFamily="@font/lato_semibold"
                 android:textColor="@color/colorGray"
                 android:textSize="13sp"
+                android:text="@{itemResult.user.username}"
                 app:layout_constraintStart_toEndOf="@+id/imageView2"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Thing" />
@@ -90,6 +93,7 @@
                 android:fontFamily="@font/lato_regular"
                 android:textColor="@color/colorGray50"
                 android:textSize="10sp"
+                android:text="@{itemResult.updatedAt}"
                 app:layout_constraintStart_toEndOf="@+id/imageView2"
                 app:layout_constraintTop_toBottomOf="@+id/tv_title"
                 tools:text="3 days ago- 23 min read" />
@@ -106,6 +110,7 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/lato_heavy"
                 android:maxLines="2"
+                android:text="@{itemResult.titlePost}"
                 android:textColor="@color/colorGray"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -128,6 +133,7 @@
                 android:maxLines="3"
                 android:textColor="@color/colorGray50"
                 android:textSize="13sp"
+                android:text="@{itemResult.postDescription}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -158,6 +164,7 @@
                 android:fontFamily="@font/lato_regular"
                 android:paddingBottom="13dp"
                 android:textSize="12sp"
+                android:text="In Coder life"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/frameLayout"
                 tools:text="in Coders life" />
@@ -185,6 +192,7 @@
                 android:layout_marginBottom="9dp"
                 android:fontFamily="@font/lato_regular"
                 android:textColor="@color/colorGray"
+                android:text="123"
                 android:textSize="11sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

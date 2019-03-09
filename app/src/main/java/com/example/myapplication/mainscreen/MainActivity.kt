@@ -17,26 +17,24 @@ import com.example.myapplication.Utils.setError
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.model.Result
 import com.example.myapplication.model.ViewModel
+import com.example.myapplication.model.homemodel.ActivityFeedModel
 import com.hannesdorfmann.mosby3.mvi.MviActivity
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.jakewharton.rxbinding2.widget.RxSearchView
 import com.jakewharton.rxrelay2.PublishRelay
-import com.pacoworks.rxpaper2.RxPaperBook
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
-import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
 
-const val BASE_URL = "https://2f0243cd.ngrok.io/"
+const val BASE_URL = "https://dbd2a14b.ngrok.io"
 
 class MainActivity : MviActivity<MainView, MainPresenter>(), MainView, ViewModel.OnItemClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private val unsubs = CompositeDisposable()
-    private val onClickPublishSubject = PublishRelay.create<Result>()
+    private val onClickPublishSubject = PublishRelay.create<ActivityFeedModel>()
 
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,7 +93,7 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView, ViewModel
         }
     }
 
-    override fun onItemClick(result: Result) {
+    override fun onItemClick(result: ActivityFeedModel) {
         onClickPublishSubject.accept(result)
     }
 
@@ -106,14 +104,15 @@ class MainActivity : MviActivity<MainView, MainPresenter>(), MainView, ViewModel
         setIsBotLoading(false)
     }
 
-    private fun renderDataState(dataState: List<Result>, state: MainViewState) {
+    private fun renderDataState(dataState: List<ActivityFeedModel>, state: MainViewState) {
+        Log.e("hasil", dataState.toString())
         if (state is MainViewState.DataState) binding.viewModel?.mergeItems?.insertItem("footer")
         binding.viewModel?.items?.addAll(dataState)
         binding.executePendingBindings()
         binding.state = State.SUCCESS
     }
 
-    private fun renderSearchState(dataState: List<Result>) {
+    private fun renderSearchState(dataState: List<ActivityFeedModel>) {
         binding.viewModel?.mergeItems?.insertItem("footer")
         binding.viewModel?.items?.addAll(dataState)
         binding.executePendingBindings()

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.util.Log
 import android.util.Patterns
 import android.view.WindowManager
 import com.example.myapplication.R
@@ -17,8 +18,6 @@ import com.hannesdorfmann.mosby3.mvi.MviActivity
 import com.jakewharton.rxbinding2.view.RxView
 import com.jakewharton.rxbinding2.widget.RxTextView
 import com.jakewharton.rxrelay2.PublishRelay
-import com.pacoworks.rxpaper2.RxPaperBook
-import io.paperdb.Paper
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.Single
@@ -78,6 +77,7 @@ class LoginActivity : MviActivity<LoginView, LoginPresenter>(), LoginView {
     }
 
     private fun authenticationSuccess() {
+        progressDialog.dismiss()
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }

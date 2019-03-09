@@ -1,8 +1,8 @@
-package com.example.myapplication.model.loginmodel
+package com.example.myapplication.model.homemodel
 
 import com.google.gson.annotations.SerializedName
 
-data class PhotoProfile(
+data class PostImage(
     @SerializedName("__v")
     val v: Int,
     @SerializedName("_id")
@@ -21,8 +21,8 @@ data class PhotoProfile(
     val name: String,
     @SerializedName("provider")
     val provider: String,
-//    @SerializedName("related")
-//    val related: List<Related>,
+    @SerializedName("related")
+    val related: List<String>,
     @SerializedName("sha256")
     val sha256: String,
     @SerializedName("size")
